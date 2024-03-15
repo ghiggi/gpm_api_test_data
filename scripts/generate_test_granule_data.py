@@ -6,18 +6,18 @@ Created on Fri Oct 20 13:04:39 2023
 @author: ghiggi
 """
 import os
-import gpm_api
+import gpm
 import shutil
 
 # from tqdm import tqdm
-from gpm_api.io.products import (
+from gpm.io.products import (
     available_products,
     available_scan_modes,
 )
-from gpm_api.io.pps import find_first_pps_granule_filepath
-from gpm_api.io.download import _download_files
-from gpm_api.tests.utils.hdf5 import create_test_hdf5
-from gpm_api import _root_path
+from gpm.io.pps import find_first_pps_granule_filepath
+from gpm.io.download import _download_files
+from gpm.tests.utils.hdf5 import create_test_hdf5
+from gpm import _root_path
 
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 LOCAL_DIR_PATH = os.path.join(SCRIPT_PATH, "..", "granules")
@@ -25,7 +25,7 @@ RAW_DIRNAME = "raw"
 CUT_DIRNAME = "cut"
 PROCESSED_DIRNAME = "processed"
 
-VERSIONS = [7, 6, 5]
+VERSIONS = [7, 6]
 PRODUCT_TYPES = ["RS"]
 
 FORCE_DOWNLOAD = False
@@ -33,7 +33,7 @@ FORCE_CUT = False
 FORCE_PROCESSED = True
 
 
-gpm_api.config.set(
+gpm.config.set(
     {
         "warn_non_contiguous_scans": False,
         "warn_non_regular_timesteps": False,
@@ -41,12 +41,9 @@ gpm_api.config.set(
     }
 )
 
-# Debug
-VERSIONS = [7, 6]
-
-
+###############################################################################
 ## Test directory structure
-# .../gpm_api/tests/data/granules/
+# .../gpm/tests/data/granules/
 # <CUT>/<product_type>/<version>/<product>/<filename.hdf5>)
 # <PROCESSED>/<product_type>/<version>/<product>/<scan_mode>.nc)
 
@@ -59,7 +56,7 @@ os.makedirs(local_granules_dir_path, exist_ok=True)
 for product_type in PRODUCT_TYPES:
     for version in VERSIONS:
         version_str = "V" + str(version)
-        for product in available_products(product_type="RS", version=version):
+        for product in available_products(product_types="RS", versions=version):
             product_info = f"{product_type} {product} {version_str} product"
 
             # Retrieve a PPS filepath
@@ -117,7 +114,7 @@ for product_type in PRODUCT_TYPES:
                     if os.path.exists(processed_filepath):
                         os.remove(processed_filepath)
                     try:
-                        ds = gpm_api.open_granule(cut_filepath, scan_mode=scan_mode)
+                        ds = gpm.open_granule(cut_filepath, scan_mode=scan_mode)
                         ds.to_netcdf(processed_filepath)
                     except Exception as e:
                         print(f"Failed to process {product_info} with scan mode {scan_mode}: {e}")
@@ -125,7 +122,7 @@ for product_type in PRODUCT_TYPES:
 
 #####---------------------------------------------------------------------------.
 ##### Move data from LOCAL directory to REPO directory
-#repo_granules_dir_path = os.path.join(_root_path, "gpm_api", "tests", "data", "granules")
+#repo_granules_dir_path = os.path.join(_root_path, "gpm", "tests", "data", "granules")
 #repo_granules_dir_path = os.path.join("/home/ghiggi/GPM_TEST_DATA_DEMO")
 #os.makedirs(repo_granules_dir_path, exist_ok=True)
 
@@ -138,3 +135,5 @@ for product_type in PRODUCT_TYPES:
 #local_cut_dir = os.path.join(local_granules_dir_path, PROCESSED_DIRNAME)
 #repo_cut_dir = os.path.join(repo_granules_dir_path, PROCESSED_DIRNAME)
 #shutil.copytree(local_cut_dir, repo_cut_dir)
+
+#####---------------------------------------------------------------------------.
