@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Fri Oct 20 13:04:39 2023
+Created on Fri Oct 20 13:04:39 2023.
 
 @author: ghiggi
 """
-import os
-import gpm
 import glob
+import os
+
+import gpm
+from gpm import _root_path
 
 # from tqdm import tqdm
 from gpm.io.products import available_scan_modes
-from gpm import _root_path
 
 RAW_DIRNAME = "raw"
 CUT_DIRNAME = "cut"
@@ -19,13 +19,13 @@ PROCESSED_DIRNAME = "processed"
 
 VERSIONS = [7, 6]
 PRODUCT_TYPES = ["RS"]
- 
+
 gpm.config.set(
     {
         "warn_non_contiguous_scans": False,
         "warn_non_regular_timesteps": False,
         "warn_invalid_geolocation": False,
-    }
+    },
 )
 
 ###############################################################################
@@ -45,7 +45,7 @@ for product_type in PRODUCT_TYPES:
         cut_filepaths = glob.glob(os.path.join(cut_dir_path, "RS", "*", "*", "*"))
     else:
         cut_filepaths = glob.glob(os.path.join(cut_dir_path, "NRT", "*", "*"))
-    
+
     for cut_filepath in cut_filepaths:
         version_str, product = cut_filepath.split(os.sep)[-3:-1]
         version = int(version_str[1])
@@ -67,4 +67,4 @@ for product_type in PRODUCT_TYPES:
                 print(f"Failed to process {product_info} with scan mode {scan_mode}: {e}")
 
 
- 
+

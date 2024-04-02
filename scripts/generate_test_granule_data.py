@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Created on Fri Oct 20 13:04:39 2023
+Created on Fri Oct 20 13:04:39 2023.
 
 @author: ghiggi
 """
 import os
+
 import gpm
-import shutil
+from gpm.io.download import _download_files
+from gpm.io.pps import find_first_pps_granule_filepath
 
 # from tqdm import tqdm
 from gpm.io.products import (
     available_products,
     available_scan_modes,
 )
-from gpm.io.pps import find_first_pps_granule_filepath
-from gpm.io.download import _download_files
 from gpm.tests.utils.hdf5 import create_test_hdf5
-from gpm import _root_path
 
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 LOCAL_DIR_PATH = os.path.join(SCRIPT_PATH, "..", "granules")
@@ -38,7 +36,7 @@ gpm.config.set(
         "warn_non_contiguous_scans": False,
         "warn_non_regular_timesteps": False,
         "warn_invalid_spatial_coordinates": False,
-    }
+    },
 )
 
 ###############################################################################
@@ -62,7 +60,7 @@ for product_type in PRODUCT_TYPES:
             # Retrieve a PPS filepath
             try:
                 pps_filepath = find_first_pps_granule_filepath(
-                    product=product, product_type=product_type, version=version
+                    product=product, product_type=product_type, version=version,
                 )
             except Exception as e:
                 print(e)
@@ -83,8 +81,8 @@ for product_type in PRODUCT_TYPES:
                 _ = _download_files(
                     remote_filepaths=[pps_filepath],
                     local_filepaths=[raw_filepath],
-                    storage="pps",
-                    transfer_tool="wget",
+                    storage="PPS",
+                    transfer_tool="WGET",
                     verbose=True,
                 )
 
@@ -104,7 +102,7 @@ for product_type in PRODUCT_TYPES:
             print(f"Create {product_info} netCDF")
             scan_modes = available_scan_modes(product=product, version=version)
             processed_dir_path = os.path.join(
-                local_granules_dir_path, PROCESSED_DIRNAME, product_pattern
+                local_granules_dir_path, PROCESSED_DIRNAME, product_pattern,
             )
             os.makedirs(processed_dir_path, exist_ok=True)
 
