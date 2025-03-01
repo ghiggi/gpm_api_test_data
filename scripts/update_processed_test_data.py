@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-Created on Fri Oct 20 13:04:39 2023.
-
-@author: ghiggi
-"""
 import glob
 import os
 
@@ -54,17 +48,23 @@ for product_type in PRODUCT_TYPES:
         # Create the processed netCDF
         print(f"Create {product_info} netCDF")
         scan_modes = available_scan_modes(product=product, version=version)
-        processed_dir_path = os.path.dirname(cut_filepath).replace(CUT_DIRNAME, PROCESSED_DIRNAME)
+        processed_dir_path = os.path.dirname(cut_filepath).replace(
+            CUT_DIRNAME,
+            PROCESSED_DIRNAME,
+        )
         os.makedirs(processed_dir_path, exist_ok=True)
         for scan_mode in scan_modes:
             processed_filepath = os.path.join(processed_dir_path, f"{scan_mode}.nc")
             if os.path.exists(processed_filepath):
                 os.remove(processed_filepath)
             try:
-                ds = gpm.open_granule(cut_filepath, scan_mode=scan_mode)
+                ds = gpm.open_granule_dataset(
+                    cut_filepath,
+                    scan_mode=scan_mode,
+                ).compute()
+                ds.close()
                 ds.to_netcdf(processed_filepath)
             except Exception as e:
-                print(f"Failed to process {product_info} with scan mode {scan_mode}: {e}")
-
-
-
+                print(
+                    f"Failed to process {product_info} with scan mode {scan_mode}: {e}",
+                )

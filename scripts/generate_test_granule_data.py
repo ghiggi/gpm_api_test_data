@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-Created on Fri Oct 20 13:04:39 2023.
-
-@author: ghiggi
-"""
 import os
 
 import gpm
@@ -60,7 +54,9 @@ for product_type in PRODUCT_TYPES:
             # Retrieve a PPS filepath
             try:
                 pps_filepath = find_first_pps_granule_filepath(
-                    product=product, product_type=product_type, version=version,
+                    product=product,
+                    product_type=product_type,
+                    version=version,
                 )
             except Exception as e:
                 print(e)
@@ -71,7 +67,11 @@ for product_type in PRODUCT_TYPES:
             # Define product dir
             product_pattern = os.path.join(product_type, version_str, product)
             # Define RAW filepath
-            raw_dir = os.path.join(local_granules_dir_path, RAW_DIRNAME, product_pattern)
+            raw_dir = os.path.join(
+                local_granules_dir_path,
+                RAW_DIRNAME,
+                product_pattern,
+            )
             raw_filepath = os.path.join(raw_dir, filename)
 
             # Download file
@@ -88,7 +88,11 @@ for product_type in PRODUCT_TYPES:
 
             # Cut the granule
             print(f"Cutting {product_info}")
-            cut_dir_path = os.path.join(local_granules_dir_path, CUT_DIRNAME, product_pattern)
+            cut_dir_path = os.path.join(
+                local_granules_dir_path,
+                CUT_DIRNAME,
+                product_pattern,
+            )
             cut_filepath = os.path.join(cut_dir_path, filename)
             os.makedirs(cut_dir_path, exist_ok=True)
             if FORCE_CUT or not os.path.exists(cut_filepath):
@@ -102,7 +106,9 @@ for product_type in PRODUCT_TYPES:
             print(f"Create {product_info} netCDF")
             scan_modes = available_scan_modes(product=product, version=version)
             processed_dir_path = os.path.join(
-                local_granules_dir_path, PROCESSED_DIRNAME, product_pattern,
+                local_granules_dir_path,
+                PROCESSED_DIRNAME,
+                product_pattern,
             )
             os.makedirs(processed_dir_path, exist_ok=True)
 
@@ -112,26 +118,28 @@ for product_type in PRODUCT_TYPES:
                     if os.path.exists(processed_filepath):
                         os.remove(processed_filepath)
                     try:
-                        ds = gpm.open_granule(cut_filepath, scan_mode=scan_mode)
+                        ds = gpm.open_granule_dataset(cut_filepath, scan_mode=scan_mode)
                         ds.to_netcdf(processed_filepath)
                     except Exception as e:
-                        print(f"Failed to process {product_info} with scan mode {scan_mode}: {e}")
+                        print(
+                            f"Failed to process {product_info} with scan mode {scan_mode}: {e}",
+                        )
 
 
 #####---------------------------------------------------------------------------.
 ##### Move data from LOCAL directory to REPO directory
-#repo_granules_dir_path = os.path.join(_root_path, "gpm", "tests", "data", "granules")
-#repo_granules_dir_path = os.path.join("/home/ghiggi/GPM_TEST_DATA_DEMO")
-#os.makedirs(repo_granules_dir_path, exist_ok=True)
+# repo_granules_dir_path = os.path.join(_root_path, "gpm", "tests", "data", "granules")
+# repo_granules_dir_path = os.path.join("/home/ghiggi/GPM_TEST_DATA_DEMO")
+# os.makedirs(repo_granules_dir_path, exist_ok=True)
 
 ## Move CUT directory
-#local_cut_dir = os.path.join(local_granules_dir_path, CUT_DIRNAME)
-#repo_cut_dir = os.path.join(repo_granules_dir_path, CUT_DIRNAME)
-#shutil.copytree(local_cut_dir, repo_cut_dir)
+# local_cut_dir = os.path.join(local_granules_dir_path, CUT_DIRNAME)
+# repo_cut_dir = os.path.join(repo_granules_dir_path, CUT_DIRNAME)
+# shutil.copytree(local_cut_dir, repo_cut_dir)
 
 ## Move PROCESSED directory
-#local_cut_dir = os.path.join(local_granules_dir_path, PROCESSED_DIRNAME)
-#repo_cut_dir = os.path.join(repo_granules_dir_path, PROCESSED_DIRNAME)
-#shutil.copytree(local_cut_dir, repo_cut_dir)
+# local_cut_dir = os.path.join(local_granules_dir_path, PROCESSED_DIRNAME)
+# repo_cut_dir = os.path.join(repo_granules_dir_path, PROCESSED_DIRNAME)
+# shutil.copytree(local_cut_dir, repo_cut_dir)
 
 #####---------------------------------------------------------------------------.
